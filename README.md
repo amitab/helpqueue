@@ -7,7 +7,7 @@ Created and maintained by: [TheReddKing](mailto:kevin21@mit.edu) ([TechX](https:
 
 ### Heroku Deploy
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/techx/helpqueue/tree/master)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/bansheerubber/helpqueue/tree/master)
 
 There are two variables you need to set the master email account and also the URL of the site. These must be edited as heroku env variables.
 All other settings can be edited on the `/admin` page
