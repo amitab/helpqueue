@@ -38,6 +38,8 @@ api.add_resource(api_tickets.TicketEstimates, '/ticket/estimates')
 api.add_resource(api_user.UserRetrieveUser, '/user/ticket')
 api.add_resource(api_user.UserRetrieveAdmin, '/user/tickets')
 api.add_resource(api_user.UserProfileUpdate, '/user/update')
+api.add_resource(api_user.UserHackersOnline, '/user/hackersonline')
+api.add_resource(api_user.UserMentorsOnline, '/user/mentorsonline')
 
 api.add_resource(api_admin.AdminPromote, '/admin/promote')
 api.add_resource(api_admin.AdminUpdate, '/admin/update')
