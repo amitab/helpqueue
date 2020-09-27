@@ -6,6 +6,8 @@ import datetime
 from sqlalchemy import or_, and_
 from server.cache import should_cache_function
 
+from sqlalchemy import func, select
+from flask import current_app
 
 # Mentor rankings update every 60 seconds
 @should_cache_function("ticket_stats", 60)
@@ -137,3 +139,20 @@ def rate_ticket(user, ticket, rating):
     ticket.date_updated = now
     db.session.commit()
     return True
+
+def estimated_ticket_stats():
+    s = select([
+        func.percentile_cont(0.5).
+            within_group(Ticket.total_unclaimed_seconds).
+            label('estResponse'),
+        func.percentile_cont(0.5).
+            within_group(Ticket.total_claimed_seconds).
+            label('estCompletion')])
+    
+    row = db.session.execute(s).fetchone()
+    return {
+        'estimates': {
+            'estResponse': row['estResponse'],
+            'estCompletion': row['estCompletion']
+        }
+    }

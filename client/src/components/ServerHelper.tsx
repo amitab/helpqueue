@@ -5,6 +5,7 @@ export enum ServerURL {
   closeTicket = "/api/v1/ticket/close",
   cancelTicket = "/api/v1/ticket/cancel",
   rateTicket = "/api/v1/ticket/rate",
+  estimatesTicket = "/api/v1/ticket/estimates",
   userTicket = "/api/v1/user/ticket",
   userTickets = "/api/v1/user/tickets",
   userUpdate = "/api/v1/user/update",

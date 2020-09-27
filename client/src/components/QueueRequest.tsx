@@ -18,7 +18,7 @@ import {
 import useLogin from "../hooks/useLogin";
 import ServerHelper, { ServerURL } from "./ServerHelper";
 import useViewer from "../hooks/useViewer";
-import { Ticket, User } from "./Types";
+import { Ticket, User, Estimates } from "./Types";
 import createAlert, { AlertType } from "./Alert";
 
 const QueueRequest = () => {
@@ -31,6 +31,8 @@ const QueueRequest = () => {
   const [cTicketQuestion, setCTicketQuestion] = useState("");
   const [cTicketContact, setCTicketContact] = useState("");
   const [cTicketRating, setCTicketRating] = useState(0);
+  const [ticketEstimates, setTicketEstimates] = useState<Estimates | null>(null);
+
   const locationOptions = ((settings && settings.locations) || "no location")
     .split(",")
     .map((l) => ({ key: l, value: l, text: l }));
@@ -114,6 +116,33 @@ const QueueRequest = () => {
       createAlert(AlertType.Error, "Could not rate ticket");
     }
   };
+
+  const getTicketEstimates = async () => {
+    const res = await ServerHelper.post(ServerURL.estimatesTicket, getCredentials());
+    if (res.success) {
+      setTicketEstimates(res.estimates);
+    } else {
+      setTicketEstimates(null);
+      if (isLoggedIn) {
+        if (
+          window.confirm(
+            "Your credentials appear to be invalid... Do you want to log out and try again?"
+          )
+        ) {
+          logout();
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    // On load check to see what the status is of the ticket
+    getTicketEstimates();
+
+    const interval = setInterval(getTicketEstimates, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     // On load check to see what the status is of the ticket
     getTicket();
@@ -124,6 +153,18 @@ const QueueRequest = () => {
   if (!isLoggedIn) {
     window.location.href = "/login";
     return null;
+  }
+
+  let estimatesCard = null;
+  if (ticketEstimates != null) {
+    estimatesCard = (<>
+      <p>Estimated Response time: <span>{ticketEstimates.estResponse}</span>&nbsp;seconds,&nbsp;
+      Estimated Completion time: <span>{ticketEstimates.estCompletion}</span>&nbsp;seconds</p>
+    </>);
+  } else {
+    estimatesCard = (<>
+      <p>Waiting for mentors!</p>
+    </>);
   }
 
   let queueCard = null;
@@ -289,6 +330,9 @@ const QueueRequest = () => {
   }
   return (
     <Container>
+      <Card color="blue">
+        {estimatesCard}
+      </Card>
       <Card color="orange">
         <div>
           {user && user.admin_is ? (

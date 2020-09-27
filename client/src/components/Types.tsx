@@ -39,3 +39,8 @@ export type ClientSettings = {
   github_client_id: string;
   locations: string;
 }
+
+export type Estimates = {
+  estResponse: number,
+  estCompletion: number
+}

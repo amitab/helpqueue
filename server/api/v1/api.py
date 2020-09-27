@@ -33,6 +33,7 @@ api.add_resource(api_tickets.TicketUnclaim, '/ticket/unclaim')
 api.add_resource(api_tickets.TicketClose, '/ticket/close')
 api.add_resource(api_tickets.TicketCancel, '/ticket/cancel')
 api.add_resource(api_tickets.TicketRate, '/ticket/rate')
+api.add_resource(api_tickets.TicketEstimates, '/ticket/estimates')
 
 api.add_resource(api_user.UserRetrieveUser, '/user/ticket')
 api.add_resource(api_user.UserRetrieveAdmin, '/user/tickets')

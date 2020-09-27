@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from server.controllers.tickets import *
 from server.controllers.users import *
 from server.api.v1 import return_failure, return_success, require_login
+from server.api.v1.api_user import USER_PARSER
 from typing import cast
 
 CREATE_PARSER = reqparse.RequestParser(bundle_errors=True)
@@ -105,3 +106,10 @@ class TicketRate(Resource):
         if rate_ticket(user, ticket, data["rating"]):
             return return_success({'ticket': ticket.json()})
         return return_failure("could not cancel ticket")
+
+
+class TicketEstimates(Resource):
+    @require_login(USER_PARSER)
+    def post(self, data, user):
+        estimates = estimated_ticket_stats()
+        return return_success(estimates)
