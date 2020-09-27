@@ -40,7 +40,10 @@ export type ClientSettings = {
   locations: string;
 }
 
-export type Estimates = {
-  estResponse: number,
-  estCompletion: number
+export type DashStats = {
+  estimates: {
+    estResponse: number,
+    estCompletion: number
+  },
+  countMentors: number
 }

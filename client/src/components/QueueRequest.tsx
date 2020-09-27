@@ -18,7 +18,7 @@ import {
 import useLogin from "../hooks/useLogin";
 import ServerHelper, { ServerURL } from "./ServerHelper";
 import useViewer from "../hooks/useViewer";
-import { Ticket, User, Estimates } from "./Types";
+import { Ticket, User, DashStats } from "./Types";
 import createAlert, { AlertType } from "./Alert";
 
 const QueueRequest = () => {
@@ -31,7 +31,7 @@ const QueueRequest = () => {
   const [cTicketQuestion, setCTicketQuestion] = useState("");
   const [cTicketContact, setCTicketContact] = useState("");
   const [cTicketRating, setCTicketRating] = useState(0);
-  const [ticketEstimates, setTicketEstimates] = useState<Estimates | null>(null);
+  const [dashStats, setDashStats] = useState<DashStats | null>(null);
 
   const locationOptions = ((settings && settings.locations) || "no location")
     .split(",")
@@ -117,12 +117,12 @@ const QueueRequest = () => {
     }
   };
 
-  const getTicketEstimates = async () => {
-    const res = await ServerHelper.post(ServerURL.estimatesTicket, getCredentials());
+  const getDashStats = async () => {
+    const res = await ServerHelper.post(ServerURL.userHackerDashStats, getCredentials());
     if (res.success) {
-      setTicketEstimates(res.estimates);
+      setDashStats(res.stats);
     } else {
-      setTicketEstimates(null);
+      setDashStats(null);
       if (isLoggedIn) {
         if (
           window.confirm(
@@ -137,9 +137,9 @@ const QueueRequest = () => {
 
   useEffect(() => {
     // On load check to see what the status is of the ticket
-    getTicketEstimates();
+    getDashStats();
 
-    const interval = setInterval(getTicketEstimates, 10000);
+    const interval = setInterval(getDashStats, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -156,10 +156,11 @@ const QueueRequest = () => {
   }
 
   let estimatesCard = null;
-  if (ticketEstimates != null) {
+  if (dashStats != null) {
     estimatesCard = (<>
-      <p>Estimated Response time: <span>{ticketEstimates.estResponse}</span>&nbsp;seconds,&nbsp;
-      Estimated Completion time: <span>{ticketEstimates.estCompletion}</span>&nbsp;seconds</p>
+      <p>Estimated Response time: <span>{dashStats.estimates.estResponse}</span>&nbsp;seconds,&nbsp;
+      Estimated Completion time: <span>{dashStats.estimates.estCompletion}</span>&nbsp;seconds</p>
+      <p><span>{dashStats.countMentors}</span>&nbsp;Mentors online</p>
     </>);
   } else {
     estimatesCard = (<>

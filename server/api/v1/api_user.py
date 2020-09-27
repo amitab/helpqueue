@@ -84,3 +84,14 @@ class UserMentorsOnline(Resource):
         return return_success({
             'countMentors': get_mentors_online()
         })
+
+
+class UserHackerDashStats(Resource):
+    @require_login(USER_PARSER)
+    def post(self, data, user):
+        return return_success({
+            'stats': {
+                'countMentors': get_mentors_online(),
+                'estimates': estimated_ticket_stats()['estimates']
+            }
+        })
