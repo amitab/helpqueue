@@ -14,6 +14,7 @@ import {
   Header,
   MessageHeader,
   Select,
+  Icon
 } from "semantic-ui-react";
 import useLogin from "../hooks/useLogin";
 import ServerHelper, { ServerURL } from "./ServerHelper";
@@ -160,7 +161,7 @@ const QueueRequest = () => {
     estimatesCard = (<>
       <p>Estimated Response time: <span>{dashStats.estimates.estResponse}</span>&nbsp;seconds,&nbsp;
       Estimated Completion time: <span>{dashStats.estimates.estCompletion}</span>&nbsp;seconds</p>
-      <p><span>{dashStats.countMentors}</span>&nbsp;Mentors online</p>
+      <p><Icon fitted name="circle" color={dashStats.countMentors == 0 ? "red" : "green"} />&nbsp;<span>{dashStats.countMentors}</span>&nbsp;Mentor(s) online</p>
     </>);
   } else {
     estimatesCard = (<>
