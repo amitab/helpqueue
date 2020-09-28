@@ -16,6 +16,7 @@ const ProfilePage = () => {
   const { isLoggedIn } = useViewer();
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
+  const [team, setTeam] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [permissionsGranted, setPermissionsGranted] = useState(true);
 
@@ -24,6 +25,7 @@ const ProfilePage = () => {
     if (res.success) {
       setUser(res.user);
       setName(res.user.name || "");
+      setTeam(res.user.team || "");
     } else {
       setUser(null);
       createAlert(AlertType.Error, "Failed to get user, are you logged in?");
@@ -37,6 +39,7 @@ const ProfilePage = () => {
     const res = await ServerHelper.post(ServerURL.userUpdate, {
       ...getCredentials(),
       name: name,
+      team: team,
       affiliation: "", // TODO(kevinfang): add company affiliation
       skills: skills.join(";"),
     });
@@ -111,6 +114,17 @@ const ProfilePage = () => {
               className="text-center"
             />
           </Form.Field>
+          {!user.mentor_is ? (
+            <>
+              <Form.Field>
+                <Input
+                  label="Team Name:"
+                  value={team}
+                  onChange={(e) => setTeam(e.target.value)}
+                />
+              </Form.Field>
+            </>
+          ) : null}
         </Form>
         <br />
         {user.mentor_is ? (

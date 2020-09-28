@@ -24,6 +24,7 @@ export type User = {
   skills: string;
   admin_is: boolean;
   mentor_is: boolean;
+  team: string;
 };
 
 // In server_constants.py

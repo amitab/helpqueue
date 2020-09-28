@@ -14,6 +14,7 @@ class User(Base):
     name = Column(String)
 
     affiliation = Column(String)
+    team = Column(String)
 
     contact_info = Column(String)
 
@@ -48,5 +49,6 @@ class User(Base):
             'name': self.name,
             'admin_is': self.admin_is,
             'mentor_is': self.mentor_is,
-            'skills': self.skills
+            'skills': self.skills,
+            'team': self.team
         }

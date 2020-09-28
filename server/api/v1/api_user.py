@@ -54,6 +54,9 @@ USER_UPDATE_PARSER.add_argument('name',
 USER_UPDATE_PARSER.add_argument('affiliation',
                                 help='Needs affiliation',
                                 required=True)
+USER_UPDATE_PARSER.add_argument('team',
+                                help='Needs team',
+                                required=True)
 USER_UPDATE_PARSER.add_argument('skills',
                                 help='Need skills',
                                 required=True)
@@ -64,6 +67,7 @@ class UserProfileUpdate(Resource):
     def post(self, data, user):
         set_name(user, data['name'])
         set_affiliation(user, data['affiliation'])
+        set_team(user, data['team'])
         set_skills(user, data['skills'])
         return return_success({
             'user': user.json()
