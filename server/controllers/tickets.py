@@ -53,14 +53,14 @@ def get_ticket_queue_position(user, ticket_id):
         .filter(or_(Ticket.status == 0, Ticket.status == 2)).order_by(Ticket.id).subquery()
 
     res = db.session.query(inner_select.c.total, inner_select.c.q_pos)\
-        .filter(inner_select.c.id == ticket_id).one()
+        .filter(inner_select.c.id == ticket_id).all()
     # res = db.session.query(func.count().over().label('total'), func.row_number().over(order_by=desc(Ticket.id)).label('q_pos'))\
     #     .filter(and_(
     #         or_(Ticket.status == 0, Ticket.status == 2),
     #         Ticket.id == ticket_id)).order_by(Ticket.id).one()
     
     # print(res)
-    return res
+    return (None, None,) if len(res) == 0 else res[0]
 
 
 def get_ticket(ticket_id):

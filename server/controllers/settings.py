@@ -19,7 +19,7 @@ def validate_team_name(team_name):
     s = select([
     func.string_to_array(Setting.value, ',').op('@>')([team_name]).\
         label('has')]).\
-            where(Setting.key == 'locations')
+            where(Setting.key == 'teams')
     row = db.session.execute(s).fetchone()
     return row[0]
 

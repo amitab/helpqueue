@@ -20,7 +20,7 @@ const ProfilePage = () => {
   const [team, setTeam] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [permissionsGranted, setPermissionsGranted] = useState(true);
-  const teamOptions = ((settings && settings.locations) || "no team")
+  const teamOptions = ((settings && settings.teams) || "no team")
       .split(",")
       .map((l) => ({ key: l, value: l, text: l }));
 

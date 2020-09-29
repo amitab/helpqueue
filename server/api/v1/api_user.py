@@ -69,7 +69,7 @@ USER_UPDATE_PARSER.add_argument('skills',
 class UserProfileUpdate(Resource):
     @require_login(USER_UPDATE_PARSER)
     def post(self, data, user):
-        if not validate_team_name(data['team']):
+        if not user.mentor_is and not validate_team_name(data['team']):
             return return_failure("Invalid Team name")
             
         set_name(user, data['name'])

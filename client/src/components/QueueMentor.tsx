@@ -16,10 +16,10 @@ const QueueMentor = () => {
   const [rankings, setRankings] = useState([]);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [queueLength, setQueueLength] = useState(0);
-  const locationOptions = [
+  const teamOptions = [
     { key: "", value: "no team", text: "No filter" },
   ].concat(
-    ((settings && settings.locations) || "no team")
+    ((settings && settings.teams) || "no team")
       .split(",")
       .map((l) => ({ key: l, value: l, text: l }))
   );
@@ -179,7 +179,7 @@ const QueueMentor = () => {
             <h2>Mentor Queue</h2>
             <p>Queue length: {queueLength}</p>
             <Select
-              options={locationOptions}
+              options={teamOptions}
               value={searchValue}
               onChange={(_e, data) => setSearchValue("" + data.value || "")}
             />
