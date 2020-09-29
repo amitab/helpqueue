@@ -17,14 +17,14 @@ const QueueMentor = () => {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [queueLength, setQueueLength] = useState(0);
   const locationOptions = [
-    { key: "", value: "no location", text: "No filter" },
+    { key: "", value: "no team", text: "No filter" },
   ].concat(
-    ((settings && settings.locations) || "no location")
+    ((settings && settings.locations) || "no team")
       .split(",")
       .map((l) => ({ key: l, value: l, text: l }))
   );
   const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
-  const [searchValue, setSearchValue] = useState<string>("no location");
+  const [searchValue, setSearchValue] = useState<string>("no team");
 
   const getTickets = async () => {
     const res = await ServerHelper.post(
@@ -53,12 +53,12 @@ const QueueMentor = () => {
 
   useEffect(() => {
     if (!tickets) return;
-    if (searchValue === "no location") {
+    if (searchValue === "no team") {
       setFilteredTickets(tickets);
       return;
     }
     setFilteredTickets(
-      tickets.filter((ticket) => ticket.data.location.includes(searchValue))
+      tickets.filter((ticket) => ticket.team.includes(searchValue))
     );
   }, [searchValue, tickets]);
 
@@ -84,10 +84,10 @@ const QueueMentor = () => {
               <b>mins ago</b>:
             </p>
             <p>{ticket.data.question}</p>
-            {ticket.data.location !== "no location" &&
-            ticket.data.location !== "default" ? (
+            {ticket.team !== "" &&
+            ticket.team !== "default" ? (
               <Badge color="primary" className="m-5">
-                {ticket.data.location}
+                {ticket.team}
               </Badge>
             ) : null}
             <Button
@@ -121,7 +121,7 @@ const QueueMentor = () => {
         <p>
           <b>Question:</b> {ticket.data.question}
           <br />
-          <b>Location:</b> {ticket.data.location}
+          <b>Team:</b> {ticket.team}
           <br />
           <b>Contact:</b> {ticket.data.contact}
         </p>
