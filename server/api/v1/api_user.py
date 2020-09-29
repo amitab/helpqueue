@@ -81,22 +81,6 @@ class UserProfileUpdate(Resource):
         })
 
 
-class UserHackersOnline(Resource):
-    @require_login(USER_PARSER)
-    def post(self):
-        return return_success({
-            'countHackers': get_hackers_online()
-        })
-
-
-class UserMentorsOnline(Resource):
-    @require_login(USER_PARSER)
-    def post(self):
-        return return_success({
-            'countMentors': get_mentors_online()
-        })
-
-
 class UserHackerDashStats(Resource):
     @require_login(USER_PARSER)
     def post(self, data, user):

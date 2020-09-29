@@ -106,10 +106,3 @@ class TicketRate(Resource):
         if rate_ticket(user, ticket, data["rating"]):
             return return_success({'ticket': ticket.json()})
         return return_failure("could not cancel ticket")
-
-
-class TicketEstimates(Resource):
-    @require_login(USER_PARSER)
-    def post(self, data, user):
-        estimates = estimated_ticket_stats()
-        return return_success(estimates)
