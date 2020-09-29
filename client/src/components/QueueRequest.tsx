@@ -71,7 +71,7 @@ const QueueRequest = () => {
       }
       setTicket(res.ticket);
       setUser(res.user);
-      setQueueLength(res.queue_position + 1);
+      setQueueLength(res.queue_position);
     } else {
       setTicket(null);
       if (isLoggedIn) {

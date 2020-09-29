@@ -13,13 +13,17 @@ class UserRetrieveUser(Resource):
     @require_login(USER_PARSER)
     def post(self, data, user):
         ticket = user_get_ticket(user)
-        tickets = get_claimable_tickets(user, override=True)
-        total_tickets = len(tickets) if tickets is not None else 0
-        current_position = total_tickets
-        for i, t in enumerate(tickets):
-            if t[0] == ticket:
-                current_position = i
-                break
+        # tickets = get_claimable_tickets(user, override=True)
+        if ticket != None:
+            total_tickets, current_position = get_ticket_queue_position(user, ticket.id)
+        else:
+            total_tickets, current_position = 0, 0
+        # total_tickets = len(tickets) if tickets is not None else 0
+        # current_position = total_tickets
+        # for i, t in enumerate(tickets):
+        #     if t == ticket:
+        #         current_position = i
+        #         break
         return return_success({
             'ticket': ticket.json() if ticket is not None else None,
             'queue_position': current_position,
