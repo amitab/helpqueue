@@ -167,3 +167,7 @@ def user_get_claim_ticket(user):
         return query.first()
     # No current ticket
     return None, None
+
+
+def get_user_by_id(id):
+    return User.query.filter(User.id == id).one()

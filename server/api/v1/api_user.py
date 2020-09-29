@@ -90,3 +90,51 @@ class UserHackerDashStats(Resource):
                 'estimates': estimated_ticket_stats()['estimates']
             }
         })
+
+
+TEST_PARSER = reqparse.RequestParser(bundle_errors=True)
+TEST_PARSER.add_argument('id', help='Need id', required=True, type=int)
+
+
+class UserDashboard(Resource):
+    def post(self):
+        req = TEST_PARSER.parse_args()
+        user = get_user_by_id(req['id'])
+        
+        data = get_user_ticket_dash(user)
+        data['rankings'] = mentor_rankings() if user.mentor_is else None
+        data['stats']['countMentors'] = get_mentors_online()
+        
+        return return_success(data)
+
+
+class UserDashboardA(Resource):
+    def post(self):
+        req = TEST_PARSER.parse_args()
+        user = get_user_by_id(req['id'])
+        
+        return return_success({
+            'stats': {
+                'countMentors': get_mentors_online(),
+                'estimates': estimated_ticket_stats()['estimates']
+            }
+        })
+
+class UserDashboardB(Resource):
+    def post(self):
+        req = TEST_PARSER.parse_args()
+        user = get_user_by_id(req['id'])
+        
+        ticket = user_get_ticket(user)
+        if ticket != None:
+            total_tickets, current_position = get_ticket_queue_position(user, ticket.id)
+        else:
+            total_tickets, current_position = 0, 0
+
+        return return_success({
+            'ticket': ticket.json() if ticket is not None else None,
+            'queue_position': current_position,
+            'queue_length': total_tickets,
+            'rankings': mentor_rankings(),
+            'user': user.json()
+        })

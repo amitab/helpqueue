@@ -9,6 +9,28 @@ from server.cache import should_cache_function
 from sqlalchemy import func, select
 from flask import current_app
 
+from sqlalchemy.sql.expression import literal
+from sqlalchemy.orm import aliased
+
+import json
+
+def tuple_to_ticket_json(tuple):
+    if tuple['id'] == None:
+        return None
+
+    now = datetime.datetime.now()
+    return {
+        "id": tuple['id'],
+        "data": json.loads(tuple['data']),
+        "uid": tuple['uid'],
+        "status": tuple['status'],
+        "requested_by": tuple['requestor'],
+        "claimed_by": tuple['claimant'],
+        "minutes": (now-tuple['date_created']).total_seconds()//60,
+        "team": tuple['team']
+    }
+
+
 # Mentor rankings update every 60 seconds
 @should_cache_function("ticket_stats", 60)
 def ticket_stats():
@@ -176,5 +198,53 @@ def estimated_ticket_stats():
         'estimates': {
             'estResponse': row[0],
             'estCompletion': row[1]
+        }
+    }
+    
+def get_user_ticket_dash(user):
+    queue = db.session.query(
+            Ticket.requestor_id.label('user_in_line'),
+            func.count().over().label('total'),
+            func.row_number().over(order_by=Ticket.id).label('q_pos'))\
+        .filter(or_(Ticket.status == 0, Ticket.status == 2)).order_by(Ticket.id).subquery()
+    
+    queue_stats = db.session.query(queue.c.total, queue.c.q_pos)\
+        .filter(queue.c.user_in_line == user.id).subquery()
+
+    Requestor = aliased(User)
+    Claimant = aliased(User)
+
+    current_ticket = db.session.query(Ticket, Requestor.name.label('requestor'), Claimant.name.label('claimant'), Requestor.team.label('team'))\
+        .join(Requestor, Ticket.requestor_id == Requestor.id)\
+        .outerjoin(Claimant, Ticket.claimant_id == Claimant.id)\
+        .filter(and_(Ticket.requestor_id == user.id, Ticket.status < 4))\
+        .subquery()
+    
+    ticket_info = db.session.query(current_ticket, queue_stats).outerjoin(queue_stats, literal(True)).subquery()
+
+    fin_stats = db.session.query(
+                func.percentile_cont(0.5).
+                    within_group(Ticket.total_unclaimed_seconds).
+                    label('estResponse'),
+                func.percentile_cont(0.5).
+                    within_group(Ticket.total_claimed_seconds).
+                    label('estCompletion'))\
+            .filter(or_(Ticket.status == 3, Ticket.status == 5)).subquery()
+            
+    dash_stats = db.session.query(fin_stats, ticket_info).outerjoin(ticket_info, literal(True)).all()
+    
+    # print(dash_stats[0]._asdict())
+    tuple = dash_stats[0]._asdict()
+    return {
+        'ticket': tuple_to_ticket_json(tuple),
+        'queue_position': tuple['q_pos'],
+        'queue_length': tuple['total'],
+        # 'rankings': ,
+        'user': user.json(),
+        'stats': {
+            'estimates': {
+                'estResponse': tuple['estResponse'],
+                'estCompletion': tuple['estCompletion']
+            }
         }
     }
