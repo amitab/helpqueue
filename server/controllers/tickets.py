@@ -37,8 +37,11 @@ def ticket_stats():
 def get_claimable_tickets(user, override=False):
     if not user.mentor_is and not override:
         return []
-    tickets = Ticket.query.filter(
-        or_(Ticket.status == 0, Ticket.status == 2)).order_by(Ticket.id).all()
+    tickets = db.session.query(Ticket, User.team)\
+        .join(User, User.id == Ticket.requestor_id)\
+        .filter(or_(Ticket.status == 0, Ticket.status == 2)).order_by(Ticket.id).all()
+    # tickets = Ticket.query.filter(
+    #     or_(Ticket.status == 0, Ticket.status == 2)).order_by(Ticket.id).all()
     return tickets
 
 

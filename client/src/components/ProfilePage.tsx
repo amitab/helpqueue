@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Input, Label, Card, Form } from "semantic-ui-react";
+import { Container, Button, Input, Label, Card, Form, Select } from "semantic-ui-react";
 import useLogin from "../hooks/useLogin";
 import { User } from "./Types";
 import ServerHelper, { ServerURL } from "./ServerHelper";
@@ -14,11 +14,15 @@ const ProfilePage = () => {
   const { getCredentials } = useLogin();
   const [_cookies, setCookie] = useCookies();
   const { isLoggedIn } = useViewer();
+  const { settings } = useViewer();
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [team, setTeam] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [permissionsGranted, setPermissionsGranted] = useState(true);
+  const teamOptions = ((settings && settings.locations) || "no team")
+      .split(",")
+      .map((l) => ({ key: l, value: l, text: l }));
 
   const getUser = async () => {
     const res = await ServerHelper.post(ServerURL.userTicket, getCredentials());
@@ -116,11 +120,12 @@ const ProfilePage = () => {
           </Form.Field>
           {!user.mentor_is ? (
             <>
-              <Form.Field>
-                <Input
-                  label="Team Name:"
+              <Form.Field required>
+                <label>Team Name:</label>
+                <Select
                   value={team}
-                  onChange={(e) => setTeam(e.target.value)}
+                  options={teamOptions}
+                  onChange={(_e, data) => setTeam("" + data.value || "")}
                 />
               </Form.Field>
             </>

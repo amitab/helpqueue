@@ -17,7 +17,7 @@ class UserRetrieveUser(Resource):
         total_tickets = len(tickets) if tickets is not None else 0
         current_position = total_tickets
         for i, t in enumerate(tickets):
-            if t == ticket:
+            if t[0] == ticket:
                 current_position = i
                 break
         return return_success({
@@ -35,12 +35,12 @@ class UserRetrieveAdmin(Resource):
 
     @require_login(USER_PARSER)
     def post(self, data, user):
-        ticket = user_get_claim_ticket(user)
+        ticket, team = user_get_claim_ticket(user)
         tickets = get_claimable_tickets(user)
         total_tickets = len(tickets) if tickets is not None else 0
         return return_success({
-            'ticket': ticket.json() if ticket is not None else None,
-            'tickets': [t.json() for t in tickets],
+            'ticket': ticket.json(team) if ticket is not None else None,
+            'tickets': [t[0].json(t[1]) for t in tickets],
             'queue_length': total_tickets,
             'rankings': mentor_rankings(),
             'user': user.json()
@@ -65,6 +65,9 @@ USER_UPDATE_PARSER.add_argument('skills',
 class UserProfileUpdate(Resource):
     @require_login(USER_UPDATE_PARSER)
     def post(self, data, user):
+        if not validate_team_name(data['team']):
+            return return_failure("Invalid Team name")
+            
         set_name(user, data['name'])
         set_affiliation(user, data['affiliation'])
         set_team(user, data['team'])

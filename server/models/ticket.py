@@ -52,7 +52,7 @@ class Ticket(Base):
         self.data = data
         self.uid = random_id_string(stringLength=12)
 
-    def json(self):
+    def json(self, team=None):
         """Returns JSON of the ticket object
 
         Returns:
@@ -66,5 +66,6 @@ class Ticket(Base):
             "status": self.status,
             "requested_by": self.requestor.name,
             "claimed_by": self.claimant.name if self.claimant else "",
-            "minutes": (now-self.date_created).total_seconds()//60
+            "minutes": (now-self.date_created).total_seconds()//60,
+            "team": team if team is not None else ""
         }

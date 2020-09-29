@@ -156,9 +156,14 @@ def user_get_claim_ticket(user):
         Ticket or None
     """
     # Getting current ticket
-    query = Ticket.query.filter(
-        and_(Ticket.claimant == user, Ticket.status < 3))
+    query = db.session.query(Ticket, User.team)\
+        .join(User, User.id == Ticket.requestor_id)\
+        .filter(and_(Ticket.claimant == user, Ticket.status < 3))
+    # query = Ticket.query\
+    #     .join(User, User.id == Ticket.requestor_id)\
+    #     .filter(
+    #         and_(Ticket.claimant == user, Ticket.status < 3))
     if (query.count() > 0):
         return query.first()
     # No current ticket
-    return None
+    return None, None

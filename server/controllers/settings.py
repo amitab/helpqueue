@@ -3,6 +3,7 @@ from server.app import db
 from server.server_constants import *
 import datetime
 
+from sqlalchemy import func, select
 
 def get_setting(user, key, override=False):
     if not override and not user.admin_is:
@@ -12,6 +13,16 @@ def get_setting(user, key, override=False):
         return None
     else:
         return setting.value
+
+
+def validate_team_name(team_name):
+    s = select([
+    func.string_to_array(Setting.value, ',').op('@>')([team_name]).\
+        label('has')]).\
+            where(Setting.key == 'locations')
+    row = db.session.execute(s).fetchone()
+    return row[0]
+
 
 def get_public_settings():
     """
