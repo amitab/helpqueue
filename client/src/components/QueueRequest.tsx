@@ -66,8 +66,10 @@ const QueueRequest = () => {
       setTicket(res.ticket);
       setUser(res.user);
       setQueueLength(res.queue_position);
+      setDashStats(res.stats);
     } else {
       setTicket(null);
+      setDashStats(null);
       if (isLoggedIn) {
         if (
           window.confirm(
@@ -112,37 +114,37 @@ const QueueRequest = () => {
     }
   };
 
-  const getDashStats = async () => {
-    const res = await ServerHelper.post(ServerURL.userHackerDashStats, getCredentials());
-    if (res.success) {
-      setDashStats(res.stats);
-    } else {
-      setDashStats(null);
-      if (isLoggedIn) {
-        if (
-          window.confirm(
-            "Your credentials appear to be invalid... Do you want to log out and try again?"
-          )
-        ) {
-          logout();
-        }
-      }
-    }
-  };
+  // const getDashStats = async () => {
+  //   const res = await ServerHelper.post(ServerURL.userHackerDashStats, getCredentials());
+  //   if (res.success) {
+  //     setDashStats(res.stats);
+  //   } else {
+  //     setDashStats(null);
+  //     if (isLoggedIn) {
+  //       if (
+  //         window.confirm(
+  //           "Your credentials appear to be invalid... Do you want to log out and try again?"
+  //         )
+  //       ) {
+  //         logout();
+  //       }
+  //     }
+  //   }
+  // };
 
-  useEffect(() => {
-    // On load check to see what the status is of the ticket
-    getDashStats();
+  // useEffect(() => {
+  //   // On load check to see what the status is of the ticket
+  //   getDashStats();
 
-    const interval = setInterval(getDashStats, 10000);
-    return () => clearInterval(interval);
-  }, []);
+  //   const interval = setInterval(getDashStats, 10000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   useEffect(() => {
     // On load check to see what the status is of the ticket
     getTicket();
 
-    const interval = setInterval(getTicket, 5000);
+    const interval = setInterval(getTicket, 10000);
     return () => clearInterval(interval);
   }, []);
   if (!isLoggedIn) {

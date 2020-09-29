@@ -19,6 +19,7 @@ db = SQLAlchemy(app)
 
 if app.config["DEBUG"]:
     app.debug = True
+    # app.config["SQLALCHEMY_ECHO"] = True
 else:
     app.debug = False
 

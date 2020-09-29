@@ -12,25 +12,30 @@ class UserRetrieveUser(Resource):
 
     @require_login(USER_PARSER)
     def post(self, data, user):
-        ticket = user_get_ticket(user)
-        # tickets = get_claimable_tickets(user, override=True)
-        if ticket != None:
-            total_tickets, current_position = get_ticket_queue_position(user, ticket.id)
-        else:
-            total_tickets, current_position = 0, 0
-        # total_tickets = len(tickets) if tickets is not None else 0
-        # current_position = total_tickets
-        # for i, t in enumerate(tickets):
-        #     if t == ticket:
-        #         current_position = i
-        #         break
-        return return_success({
-            'ticket': ticket.json() if ticket is not None else None,
-            'queue_position': current_position,
-            'queue_length': total_tickets,
-            'rankings': mentor_rankings(),
-            'user': user.json()
-        })
+        data = get_user_ticket_dash(user)
+        data['rankings'] = mentor_rankings() if user.mentor_is else None
+        data['stats']['countMentors'] = get_mentors_online()
+
+        return return_success(data)
+        # ticket = user_get_ticket(user)
+        # # tickets = get_claimable_tickets(user, override=True)
+        # if ticket != None:
+        #     total_tickets, current_position = get_ticket_queue_position(user, ticket.id)
+        # else:
+        #     total_tickets, current_position = 0, 0
+        # # total_tickets = len(tickets) if tickets is not None else 0
+        # # current_position = total_tickets
+        # # for i, t in enumerate(tickets):
+        # #     if t == ticket:
+        # #         current_position = i
+        # #         break
+        # return return_success({
+        #     'ticket': ticket.json() if ticket is not None else None,
+        #     'queue_position': current_position,
+        #     'queue_length': total_tickets,
+        #     'rankings': mentor_rankings(),
+        #     'user': user.json()
+        # })
 
 
 class UserRetrieveAdmin(Resource):
@@ -46,7 +51,7 @@ class UserRetrieveAdmin(Resource):
             'ticket': ticket.json(team) if ticket is not None else None,
             'tickets': [t[0].json(t[1]) for t in tickets],
             'queue_length': total_tickets,
-            'rankings': mentor_rankings(),
+            'rankings': mentor_rankings() if user.mentor_is else None,
             'user': user.json()
         })
 
@@ -100,6 +105,7 @@ class UserMentorsOnline(Resource):
 class UserHackerDashStats(Resource):
     @require_login(USER_PARSER)
     def post(self, data, user):
+        # get_user_ticket_dash(user)
         return return_success({
             'stats': {
                 'countMentors': get_mentors_online(),
