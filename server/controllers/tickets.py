@@ -162,18 +162,19 @@ def rate_ticket(user, ticket, rating):
     return True
 
 def estimated_ticket_stats():
-    s = select([
-        func.percentile_cont(0.5).
-            within_group(Ticket.total_unclaimed_seconds).
-            label('estResponse'),
-        func.percentile_cont(0.5).
-            within_group(Ticket.total_claimed_seconds).
-            label('estCompletion')])
-    
-    row = db.session.execute(s).fetchone()
+    row = db.session.query(
+                func.percentile_cont(0.5).
+                    within_group(Ticket.total_unclaimed_seconds).
+                    label('estResponse'),
+                func.percentile_cont(0.5).
+                    within_group(Ticket.total_claimed_seconds).
+                    label('estCompletion'))\
+            .filter(or_(Ticket.status == 3, Ticket.status == 5))\
+            .one()
+
     return {
         'estimates': {
-            'estResponse': row['estResponse'],
-            'estCompletion': row['estCompletion']
+            'estResponse': row[0],
+            'estCompletion': row[1]
         }
     }
