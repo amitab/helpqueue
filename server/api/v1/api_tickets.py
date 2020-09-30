@@ -21,7 +21,6 @@ class TicketCreate(Resource):
 
     @require_login(CREATE_PARSER)
     def post(self, data, user):
-        print(data)
         q_data = {
             'question': data['question'],
             'contact': data['contact'],
