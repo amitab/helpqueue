@@ -28,6 +28,7 @@ def require_login(parser):
             user = verify_token(data)
             if (user is None):
                 return return_failure("could not verify token", error_code=999)
+            user.is_active()
             value = func(self, data, user)
             return value
         return inner

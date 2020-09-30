@@ -149,3 +149,22 @@ def rate_ticket(user, ticket, rating):
     ticket.date_updated = now
     db.session.commit()
     return True
+
+@should_cache_function("ticket_estimates", 60)
+def estimated_ticket_stats():
+    row = db.session.query(
+                func.percentile_cont(0.5).
+                    within_group(Ticket.total_unclaimed_seconds).
+                    label('estResponse'),
+                func.percentile_cont(0.5).
+                    within_group(Ticket.total_claimed_seconds).
+                    label('estCompletion'))\
+            .filter(or_(Ticket.status == 3, Ticket.status == 5))\
+            .one()
+
+    return {
+        'estimates': {
+            'estResponse': row[0],
+            'estCompletion': row[1]
+        }
+    }

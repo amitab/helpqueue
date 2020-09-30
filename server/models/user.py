@@ -28,6 +28,7 @@ class User(Base):
     date_created = Column(DateTime, default=datetime.datetime.now)
     date_updated = Column(DateTime, default=datetime.datetime.now)
     date_last_signin = Column(DateTime, default=datetime.datetime.now)
+    date_last_activity = Column(DateTime, default=datetime.datetime.now)
 
     def __init__(self, name, email, org=None):
         self.name = name
@@ -35,6 +36,10 @@ class User(Base):
 
     def sign_in(self):
         self.date_last_signin = datetime.datetime.now()
+        update_db()
+        
+    def is_active(self):
+        self.date_last_activity = datetime.datetime.now()
         update_db()
 
     def json(self):

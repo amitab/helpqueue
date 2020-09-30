@@ -37,6 +37,7 @@ api.add_resource(api_tickets.TicketRate, '/ticket/rate')
 api.add_resource(api_user.UserRetrieveUser, '/user/ticket')
 api.add_resource(api_user.UserRetrieveAdmin, '/user/tickets')
 api.add_resource(api_user.UserProfileUpdate, '/user/update')
+api.add_resource(api_user.UserHackerDashStats, '/user/hackerdashstats')
 
 api.add_resource(api_admin.AdminPromote, '/admin/promote')
 api.add_resource(api_admin.AdminUpdate, '/admin/update')

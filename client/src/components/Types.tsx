@@ -40,4 +40,11 @@ export type ClientSettings = {
   github_client_id: string;
   teams: string;
 }
+
+export type DashStats = {
+  estimates: {
+    estResponse: number,
+    estCompletion: number
+  },
+  countMentors: number
 }

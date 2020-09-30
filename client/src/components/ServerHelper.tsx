@@ -8,6 +8,7 @@ export enum ServerURL {
   userTicket = "/api/v1/user/ticket",
   userTickets = "/api/v1/user/tickets",
   userUpdate = "/api/v1/user/update",
+  userHackerDashStats = "/api/v1/user/hackerdashstats",
   login = "/api/v1/client/login",
   settings = "/api/v1/client",
   admin = "/api/v1/admin/settings",
