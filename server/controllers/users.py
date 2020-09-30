@@ -78,6 +78,11 @@ def set_affiliation(user, affiliation):
     db.session.commit()
 
 
+def set_team(user, team):
+    user.team = team
+    db.session.commit()
+
+
 def set_skills(user, skills):
     user.skills = skills
     db.session.commit()

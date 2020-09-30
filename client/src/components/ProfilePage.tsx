@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Input, Label, Card, Form } from "semantic-ui-react";
+import { Container, Button, Input, Label, Card, Form, Select } from "semantic-ui-react";
 import useLogin from "../hooks/useLogin";
 import { User } from "./Types";
 import ServerHelper, { ServerURL } from "./ServerHelper";
@@ -14,16 +14,22 @@ const ProfilePage = () => {
   const { getCredentials } = useLogin();
   const [_cookies, setCookie] = useCookies();
   const { isLoggedIn } = useViewer();
+  const { settings } = useViewer();
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
+  const [team, setTeam] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [permissionsGranted, setPermissionsGranted] = useState(true);
+  const teamOptions = ((settings && settings.teams) || "no team")
+      .split(",")
+      .map((l) => ({ key: l, value: l, text: l }));
 
   const getUser = async () => {
     const res = await ServerHelper.post(ServerURL.userTicket, getCredentials());
     if (res.success) {
       setUser(res.user);
       setName(res.user.name || "");
+      setTeam(res.user.team || "");
     } else {
       setUser(null);
       createAlert(AlertType.Error, "Failed to get user, are you logged in?");
@@ -37,6 +43,7 @@ const ProfilePage = () => {
     const res = await ServerHelper.post(ServerURL.userUpdate, {
       ...getCredentials(),
       name: name,
+      team: team,
       affiliation: "", // TODO(kevinfang): add company affiliation
       skills: skills.join(";"),
     });
@@ -111,6 +118,18 @@ const ProfilePage = () => {
               className="text-center"
             />
           </Form.Field>
+          {!user.mentor_is ? (
+            <>
+              <Form.Field required>
+                <label>Team Name:</label>
+                <Select
+                  value={team}
+                  options={teamOptions}
+                  onChange={(_e, data) => setTeam("" + data.value || "")}
+                />
+              </Form.Field>
+            </>
+          ) : null}
         </Form>
         <br />
         {user.mentor_is ? (

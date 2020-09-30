@@ -6,6 +6,8 @@ import datetime
 from sqlalchemy import or_, and_
 from server.cache import should_cache_function
 
+from sqlalchemy import func, select
+from flask import current_app
 
 # Mentor rankings update every 60 seconds
 @should_cache_function("ticket_stats", 60)
@@ -38,6 +40,16 @@ def get_claimable_tickets(user, override=False):
     tickets = Ticket.query.filter(
         or_(Ticket.status == 0, Ticket.status == 2)).order_by(Ticket.id).all()
     return tickets
+
+
+def get_ticket_queue_position(user, ticket_id):
+    inner_select = db.session.query(Ticket.id.label('id'), func.count().over().label('total'), func.row_number().over(order_by=Ticket.id).label('q_pos'))\
+        .filter(or_(Ticket.status == 0, Ticket.status == 2)).order_by(Ticket.id).subquery()
+
+    res = db.session.query(inner_select.c.total, inner_select.c.q_pos)\
+        .filter(inner_select.c.id == ticket_id).all()
+
+    return (None, None,) if len(res) == 0 else res[0]
 
 
 def get_ticket(ticket_id):

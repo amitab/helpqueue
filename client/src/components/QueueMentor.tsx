@@ -16,15 +16,15 @@ const QueueMentor = () => {
   const [rankings, setRankings] = useState([]);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [queueLength, setQueueLength] = useState(0);
-  const locationOptions = [
-    { key: "", value: "no location", text: "No filter" },
+  const teamOptions = [
+    { key: "", value: "no team", text: "No filter" },
   ].concat(
-    ((settings && settings.locations) || "no location")
+    ((settings && settings.teams) || "no team")
       .split(",")
       .map((l) => ({ key: l, value: l, text: l }))
   );
   const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
-  const [searchValue, setSearchValue] = useState<string>("no location");
+  const [searchValue, setSearchValue] = useState<string>("no team");
 
   const getTickets = async () => {
     const res = await ServerHelper.post(
@@ -53,12 +53,12 @@ const QueueMentor = () => {
 
   useEffect(() => {
     if (!tickets) return;
-    if (searchValue === "no location") {
+    if (searchValue === "no team") {
       setFilteredTickets(tickets);
       return;
     }
     setFilteredTickets(
-      tickets.filter((ticket) => ticket.data.location.includes(searchValue))
+      tickets.filter((ticket) => ticket.data.team.includes(searchValue))
     );
   }, [searchValue, tickets]);
 
@@ -84,10 +84,10 @@ const QueueMentor = () => {
               <b>mins ago</b>:
             </p>
             <p>{ticket.data.question}</p>
-            {ticket.data.location !== "no location" &&
-            ticket.data.location !== "default" ? (
+            {ticket.data.team !== "" &&
+            ticket.data.team !== "default" ? (
               <Badge color="primary" className="m-5">
-                {ticket.data.location}
+                {ticket.data.team}
               </Badge>
             ) : null}
             <Button
@@ -121,7 +121,7 @@ const QueueMentor = () => {
         <p>
           <b>Question:</b> {ticket.data.question}
           <br />
-          <b>Location:</b> {ticket.data.location}
+          <b>Team:</b> {ticket.data.team}
           <br />
           <b>Contact:</b> {ticket.data.contact}
         </p>
@@ -179,7 +179,7 @@ const QueueMentor = () => {
             <h2>Mentor Queue</h2>
             <p>Queue length: {queueLength}</p>
             <Select
-              options={locationOptions}
+              options={teamOptions}
               value={searchValue}
               onChange={(_e, data) => setSearchValue("" + data.value || "")}
             />

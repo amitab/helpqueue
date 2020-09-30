@@ -1,8 +1,8 @@
 export type Ticket = {
   data: {
     question: string;
-    location: string;
     contact: string;
+    team: string;
   };
   id: number;
   uid: string;
@@ -24,6 +24,7 @@ export type User = {
   skills: string;
   admin_is: boolean;
   mentor_is: boolean;
+  team: string;
 };
 
 // In server_constants.py
@@ -37,5 +38,6 @@ export type ClientSettings = {
   readonly_master_url: string;
   mentor_password_key: string;
   github_client_id: string;
-  locations: string;
+  teams: string;
+}
 }

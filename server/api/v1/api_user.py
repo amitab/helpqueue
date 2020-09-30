@@ -13,13 +13,17 @@ class UserRetrieveUser(Resource):
     @require_login(USER_PARSER)
     def post(self, data, user):
         ticket = user_get_ticket(user)
-        tickets = get_claimable_tickets(user, override=True)
-        total_tickets = len(tickets) if tickets is not None else 0
-        current_position = total_tickets
-        for i, t in enumerate(tickets):
-            if t == ticket:
-                current_position = i
-                break
+        # tickets = get_claimable_tickets(user, override=True)
+        if ticket != None:
+            total_tickets, current_position = get_ticket_queue_position(user, ticket.id)
+        else:
+            total_tickets, current_position = None, None
+        # total_tickets = len(tickets) if tickets is not None else 0
+        # current_position = total_tickets
+        # for i, t in enumerate(tickets):
+        #     if t == ticket:
+        #         current_position = i
+        #         break
         return return_success({
             'ticket': ticket.json() if ticket is not None else None,
             'queue_position': current_position,
@@ -54,6 +58,9 @@ USER_UPDATE_PARSER.add_argument('name',
 USER_UPDATE_PARSER.add_argument('affiliation',
                                 help='Needs affiliation',
                                 required=True)
+USER_UPDATE_PARSER.add_argument('team',
+                                help='Needs team',
+                                required=True)
 USER_UPDATE_PARSER.add_argument('skills',
                                 help='Need skills',
                                 required=True)
@@ -62,8 +69,12 @@ USER_UPDATE_PARSER.add_argument('skills',
 class UserProfileUpdate(Resource):
     @require_login(USER_UPDATE_PARSER)
     def post(self, data, user):
+        if not user.mentor_is and not validate_team_name(data['team']):
+            return return_failure("Invalid Team name")
+            
         set_name(user, data['name'])
         set_affiliation(user, data['affiliation'])
+        set_team(user, data['team'])
         set_skills(user, data['skills'])
         return return_success({
             'user': user.json()

@@ -2,11 +2,16 @@ from flask_restful import Resource, reqparse
 from server.controllers.tickets import *
 from server.controllers.users import *
 from server.api.v1 import return_failure, return_success, require_login
+from server.api.v1.api_user import USER_PARSER
 from typing import cast
+import json
 
 CREATE_PARSER = reqparse.RequestParser(bundle_errors=True)
-CREATE_PARSER.add_argument('data',
-                           help='Needs data',
+CREATE_PARSER.add_argument('question',
+                           help='Needs question',
+                           required=True)
+CREATE_PARSER.add_argument('contact',
+                           help='Needs contact',
                            required=True)
 
 
@@ -16,7 +21,13 @@ class TicketCreate(Resource):
 
     @require_login(CREATE_PARSER)
     def post(self, data, user):
-        ticket = create_ticket(user, data['data'])
+        print(data)
+        q_data = {
+            'question': data['question'],
+            'contact': data['contact'],
+            'team': user.team
+        }
+        ticket = create_ticket(user, json.dumps(q_data))
         if (ticket is None):
             return return_failure("could not create ticket")
         return return_success({'ticket': ticket.json()})
@@ -52,7 +63,7 @@ class TicketUnclaim(Resource):
         if ticket is None:
             return return_failure("ticket not found")
         if unclaim_ticket(user, ticket):
-            return return_success({'ticket': ticket.json()})
+            return return_success()
         return return_failure("could not unclaim ticket")
 
 
@@ -66,7 +77,7 @@ class TicketClose(Resource):
         if ticket is None:
             return return_failure("ticket not found")
         if close_ticket(user, ticket):
-            return return_success({'ticket': ticket.json()})
+            return return_success()
         return return_failure("could not close ticket")
 
 
@@ -80,7 +91,7 @@ class TicketCancel(Resource):
         if ticket is None:
             return return_failure("ticket not found")
         if cancel_ticket(user, ticket):
-            return return_success({'ticket': ticket.json()})
+            return return_success()
         return return_failure("could not cancel ticket")
 
 
@@ -103,5 +114,5 @@ class TicketRate(Resource):
         if ticket is None:
             return return_failure("ticket not found")
         if rate_ticket(user, ticket, data["rating"]):
-            return return_success({'ticket': ticket.json()})
+            return return_success()
         return return_failure("could not cancel ticket")

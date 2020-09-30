@@ -31,12 +31,6 @@ const QueueRequest = () => {
   const [cTicketQuestion, setCTicketQuestion] = useState("");
   const [cTicketContact, setCTicketContact] = useState("");
   const [cTicketRating, setCTicketRating] = useState(0);
-  const locationOptions = ((settings && settings.locations) || "no location")
-    .split(",")
-    .map((l) => ({ key: l, value: l, text: l }));
-  const [cTicketLocation, setCTicketLocation] = useState(
-    locationOptions[0].value
-  );
   const [canMakeNotification, setCanMakeNotification] = useState(false);
 
   const getTicket = useCallback(async () => {
@@ -68,7 +62,7 @@ const QueueRequest = () => {
       }
       setTicket(res.ticket);
       setUser(res.user);
-      setQueueLength(res.queue_position + 1);
+      setQueueLength(res.queue_position);
     } else {
       setTicket(null);
       if (isLoggedIn) {
@@ -149,14 +143,6 @@ const QueueRequest = () => {
               onChange={(e) => setCTicketQuestion(e.currentTarget.value)}
             />
           </Form.Field>
-          <Form.Field required>
-            <label>What event?</label>
-            <Select
-              value={cTicketLocation}
-              options={locationOptions}
-              onChange={(_e, data) => setCTicketLocation("" + data.value || "")}
-            />
-          </Form.Field>
           <Form.Field>
             <label>Contact Info:</label>
             <Input
@@ -175,21 +161,11 @@ const QueueRequest = () => {
               createAlert(AlertType.Warning, "You need to ask a question!");
               return;
             }
-            if (cTicketLocation.length === 0) {
-              createAlert(
-                AlertType.Warning,
-                "Please provide a location so a mentor can find you!"
-              );
-              return;
-            }
             setCTicketRating(0);
             const res = await ServerHelper.post(ServerURL.createTicket, {
               ...getCredentials(),
-              data: JSON.stringify({
-                question: cTicketQuestion,
-                location: cTicketLocation,
-                contact: cTicketContact.length === 0 ? "N/A" : cTicketContact,
-              }),
+              question: cTicketQuestion,
+              contact: cTicketContact.length === 0 ? "N/A" : cTicketContact
             });
             if (res.success) {
               setTicket(res.ticket);
@@ -219,7 +195,7 @@ const QueueRequest = () => {
         <p>
           <b>Question:</b> {ticket.data.question}
           <br />
-          <b>Location:</b> {ticket.data.location}
+          <b>Team:</b> {user == null ? "Evil Team" :  user.team}
           <br />
           <b>Contact:</b> {ticket.data.contact}
         </p>
